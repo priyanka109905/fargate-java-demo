@@ -26,4 +26,7 @@ phases:
       - echo Pushing the Docker images...
       - echo repository uri $REPOSITORY_URI
       - docker push 435588716893.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/java-fargate:latest
-      - echo Docker push completed
+      - echo Writing image definitions file...
+      - printf '[{"name":"container","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
