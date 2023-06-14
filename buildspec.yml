@@ -21,15 +21,15 @@ phases:
       - echo image name $IMAGE_REPO_NAME:$IMAGE_TAG
       - docker build -t java-fargate .
       - echo Tagging Docker image...
-      - docker tag java-fargate:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
+      - docker tag java-fargate:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - echo repository uri $REPOSITORY_URI
-      - docker push 435588716893.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/java-fargate:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"container","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
 artifacts:
     files: 
       - imagedefinitions.json
