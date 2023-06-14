@@ -16,7 +16,7 @@ phases:
       - mvn --version
       - mvn package
       - echo Building the Docker image...
-      - docker build -t wb-tdp-tranx-dev .
+      - docker build -t $REPOSITORY_NAME .
       - echo Tagging Docker image...
       - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
