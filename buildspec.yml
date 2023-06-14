@@ -8,7 +8,6 @@ phases:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPOSITORY_NAME
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Build started on `date`
@@ -16,9 +15,9 @@ phases:
       - mvn --version
       - mvn package
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_NAME-$ENV .
+      - docker build -t $REPOSITORY_NAME .
       - echo Tagging Docker image...
-      - docker tag $REPOSITORY_NAME-$ENV:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker tag $REPOSITORY_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
@@ -26,7 +25,7 @@ phases:
       - echo repository uri $REPOSITORY_URI
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":$CONTAINER_NAME,"imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+      - printf '[{"name":$CONTAINER_NAME,"imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: 
       - imagedefinitions.json
