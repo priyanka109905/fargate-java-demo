@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo building the Jar file
-      - echo mvn --version
+      - mvn --version
       - mvn package
       - echo Building the Docker image...
       - echo image name $IMAGE_REPO_NAME:$IMAGE_TAG
