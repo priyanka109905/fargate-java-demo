@@ -7,8 +7,8 @@ phases:
       - echo $AWS_REGION
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - aws --version
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 435588716893.dkr.ecr.$AWS_REGION.amazonaws.com
-      - REPOSITORY_URI=435588716893.dkr.ecr.$AWS_REGION.amazonaws.com/wb-tdp-tranx-dev
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPOSITORY_NAME
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
@@ -18,17 +18,17 @@ phases:
       - mvn package
       - echo Building the Docker image...
       - echo image name $IMAGE_REPO_NAME:$IMAGE_TAG
-      - docker build -t wb-tdp-tranx-dev .
+      - docker build -t $REPOSITORY_NAME .
       - echo Tagging Docker image...
-      - docker tag wb-tdp-tranx-dev:latest $REPOSITORY_URI:latest
+      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - echo repository uri $REPOSITORY_URI
-      - docker push 435588716893.dkr.ecr.$AWS_REGION.amazonaws.com/wb-tdp-tranx-dev:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPOSITORY_NAME:latest
       - echo Writing image definitions file...
-      - printf '[{"name":"wb-tdp-tranx-dev","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+      - printf '[{"name":"'$CONTAINER_NAME'","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
 artifacts:
     files: 
       - imagedefinitions.json
